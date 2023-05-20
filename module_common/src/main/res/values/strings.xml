@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">commons</string>
+
+    <string name="startActivityOfApp">startActivityOfApp</string>
+    <string name="startActivityOfModuleA">startActivityOfModuleA</string>
+    <string name="startActivityOfModuleB">startActivityOfModuleB</string>
+
+    <string name="callMethodSyncOfApp">callMethodSyncOfApp</string>
+    <string name="callMethodSyncOfModuleA">callMethodSyncOfModuleA</string>
+    <string name="callMethodSyncOfModuleB">callMethodSyncOfModuleB</string>
+
+    <string name="callMethodAsyncOfApp">callMethodAsyncOfApp</string>
+    <string name="callMethodAsyncOfModuleA">callMethodAsyncOfModuleA</string>
+    <string name="callMethodAsyncOfModuleB">callMethodAsyncOfModuleB</string>
+
+    <string name="observableOfApp">observableOfApp</string>
+    <string name="observableOfModuleA">observableOfModuleA</string>
+    <string name="observableOfModuleB">observableOfModuleB</string>
+
+    <string name="getFragmentOfApp">getFragmentOfApp</string>
+    <string name="getFragmentOfModuleA">getFragmentOfModuleA</string>
+    <string name="getFragmentOfModuleB">getFragmentOfModuleB</string>
+
+    <string name="moduleA">ModuleA</string>
+    <string name="moduleB">ModuleB</string>
+
+    <string name="fragment_from_app">This Fragment is \nloaded from app</string>
+    <string name="fragment_from_moduleA">This Fragment \nis loaded from moduleA</string>
+    <string name="fragment_from_moduleB">This Fragment is \nloaded from moduleB</string>
+
+    <string name="activity_from_app">This Activity is loaded from app</string>
+    <string name="activity_from_moduleA">This Activity is loaded from moduleA</string>
+    <string name="activity_from_moduleB">This Activity is loaded from moduleB</string>
+
+
+</resources>

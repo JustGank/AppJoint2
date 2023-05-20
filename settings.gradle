@@ -1,0 +1,33 @@
+pluginManagement {
+    repositories {
+        includeBuild("appjoint2-gradle-plugin")
+        google()
+        maven { url "https://jitpack.io" }
+        maven { url 'https://maven.aliyun.com/repository/public/' }
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        maven { url "https://jitpack.io" }
+        maven { url 'https://maven.aliyun.com/repository/public/' }
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+
+
+rootProject.name = "AppJoint2"
+include ':app'
+include ':appjoint2-core'
+include ':module-A'
+include ':module_common'
+include ':module-B'
+include ':appjoint2-annotation'

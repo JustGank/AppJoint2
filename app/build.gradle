@@ -1,0 +1,49 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.appjoint2.plugin'
+}
+
+AppJoint2LogConfig  {
+    openLog true
+    debug  false
+    outputTime false
+}
+
+def config = this.rootProject.ext.android
+
+android {
+    namespace 'com.appjoint2.demo'
+    compileSdk config.compileSdkVersion
+
+    defaultConfig {
+        applicationId config.applicationId
+        minSdk config.minSdkVersion
+        targetSdk config.targetSdkVersion
+        versionCode config.versionCode
+        versionName config.versionName
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    dataBinding{ enabled true }
+}
+
+dependencies {
+    implementation project(path: ':module-A')
+    implementation project(path: ':module-B')
+
+}
+
