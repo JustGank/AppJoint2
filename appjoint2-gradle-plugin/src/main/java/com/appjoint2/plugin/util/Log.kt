@@ -24,20 +24,28 @@ class Log {
         const val ANSI_CYAN = "\u001B[36m"
         const val ANSI_WHITE = "\u001B[37m"
 
-        val timeFormat= SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS")
+        val timeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS")
 
         fun i(message: String) {
             if (logConfig.openLog) {
-                val tag=if(logConfig.outputTime) timeFormat.format(System.currentTimeMillis()) else "" +TAG
+                val tag =
+                    if (logConfig.outputTime) timeFormat.format(System.currentTimeMillis()) else "" + TAG
                 println("${ANSI_GREEN}$tag : $message$ANSI_RESET")
             }
         }
 
         fun d(message: String) {
             if (logConfig.openLog && logConfig.debug) {
-                val tag=if(logConfig.outputTime) timeFormat.format(System.currentTimeMillis()) else "" +TAG
+                val tag =
+                    if (logConfig.outputTime) timeFormat.format(System.currentTimeMillis()) else "" + TAG
                 println("$ANSI_BLUE$tag : $message$ANSI_RESET")
             }
+        }
+
+        fun w(message: String) {
+            val tag =
+                if (logConfig.outputTime) timeFormat.format(System.currentTimeMillis()) else "" + TAG
+            println("$ANSI_YELLOW$tag : $message$ANSI_RESET")
         }
 
     }

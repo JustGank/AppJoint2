@@ -4,6 +4,7 @@ import com.appjoint2.plugin.util.ClassInfoRecord
 import com.appjoint2.plugin.util.Log
 import com.appjoint2.plugin.visitor.AppJoint2ClassVisitor
 import com.appjoint2.plugin.visitor.ApplicationClassVisitor
+import com.appjoint2.plugin.visitor.FindClassVisitor
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
@@ -54,15 +55,81 @@ abstract class AppJoint2ClassTask : DefaultTask() {
     @Inject
     abstract fun getWorkerExecutor(): WorkerExecutor
 
+    private var subProjectPath = HashSet<String>()
+    private var appBuildDir = ""
+
     @TaskAction
     fun taskAction() {
         Log.i("AppJoint2ClassTask Start!")
         var time = System.currentTimeMillis()
-        val mainAppSpecClass = "${ClassInfoRecord.appSpecClass.replace(".", "/")}.class"
-        val appJointClass = "${ClassInfoRecord.ASM_APPJOINT_CLASS_PATH}.class"
 
-        Log.i("Main AppSpec Class:$mainAppSpecClass ")
-        Log.i("AppJoint2 Core Class:$appJointClass")
+        val parentProject = project.parent
+        if (parentProject == null) {
+            Log.w("AppJoint2ClassTask parentProject is null , AppJoint2 do nothing!")
+        } else {
+            appBuildDir = project.buildDir.path
+            parentProject.subprojects.forEach {
+                if (it.buildDir.path != appBuildDir)
+                    subProjectPath.add(it.buildDir.path.also { Log.i("AppJoint2ClassTask subprojects buildDir:$it") })
+            }
+
+            findClass()
+            Log.i("AppJoint2ClassTask find class custom : ${System.currentTimeMillis() - time}ms")
+            time = System.currentTimeMillis()
+
+            val mainAppSpecClass = "${ClassInfoRecord.appSpecClass.replace(".", "/")}.class"
+            Log.i("Main AppSpec Class:$mainAppSpecClass ")
+            val appJointClass = "${ClassInfoRecord.ASM_APPJOINT_CLASS_PATH}.class"
+            Log.i("AppJoint2 Core Class:$appJointClass")
+
+            writeClass(mainAppSpecClass,appJointClass)
+            Log.i("AppJoint2ClassTask write class custom : ${System.currentTimeMillis() - time}ms")
+        }
+
+    }
+
+    private fun findClass() {
+        jars.get().forEach { file ->
+            val jarFile = JarFile(file.asFile)
+            if (checkTargetIsBelongSubproject(jarFile.name)) {
+                Log.d("AppJoint2ClassTask find module jar : ${jarFile.name} ")
+                jarFile.entries().iterator().forEach { jarEntry ->
+                    if (jarEntry.isDirectory.not() && jarEntry.name.endsWith(".class")) {
+                        jarFile.getInputStream(jarEntry).use { inputStream ->
+                            findClassByVisit(inputStream, jarEntry.name)
+                        }
+                    }
+                }
+            }
+        }
+        dirs.get().forEach { directory ->
+            directory.asFile.walk().forEach { file ->
+                if (file.isFile && file.path.endsWith(".class")) {
+                    val relativePath = directory.asFile.toURI().relativize(file.toURI()).path
+                    Log.d("AppJoint2ClassTask directory asFile relativePath : ${relativePath}")
+                    file.inputStream().use { inputStream ->
+                        findClassByVisit(inputStream, relativePath)
+                    }
+                }
+            }
+        }
+    }
+
+
+    private fun checkTargetIsBelongSubproject(path: String): Boolean {
+        subProjectPath.forEach {
+            if (path.startsWith(it))
+                return true
+        }
+        return false
+    }
+
+    fun findClassByVisit(inputStream: InputStream, className: String) {
+        val classReader = ClassReader(inputStream)
+        classReader.accept(FindClassVisitor(className, classReader.interfaces), 0)
+    }
+
+    fun writeClass(mainAppSpecClass:String,appJointClass:String){
         JarOutputStream(BufferedOutputStream(FileOutputStream(output.get().asFile))).use { jarOutput ->
 
             jars.get().forEach { file ->
@@ -120,16 +187,11 @@ abstract class AppJoint2ClassTask : DefaultTask() {
                                 inputStream.copyTo(jarOutput)
                             }
                         }
-
                         jarOutput.closeEntry()
                     }
                 }
             }
-
-
         }
-
-        Log.i("AppJoint2ClassTask custom time : ${System.currentTimeMillis() - time}ms")
     }
 
     fun asmVisitApplication(inputStream: InputStream): ClassWriter {

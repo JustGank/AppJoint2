@@ -11,7 +11,6 @@ import com.appjoint2.plugin.bean.LogConfig
 import com.appjoint2.plugin.task.AppJoint2ClassTask
 import com.appjoint2.plugin.util.ClassInfoRecord
 import com.appjoint2.plugin.util.Log
-import com.appjoint2.plugin.visitor.AppJoint2AnnotationVisitorFactory
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.register
@@ -40,15 +39,6 @@ class AppJoint2Plugin : Plugin<Project> {
                     extensions.findByType(AndroidComponentsExtension::class.java)
 
                 androidComponents?.onVariants { variant ->
-
-                    variant.instrumentation
-                        .transformClassesWith(
-                            AppJoint2AnnotationVisitorFactory::class.java,
-                            InstrumentationScope.ALL
-                        ) {}
-
-                    variant.instrumentation.setAsmFramesComputationMode(FramesComputationMode.COPY_FRAMES)
-
 
                     val name = "AppJoint2${firstCharToUpperCase(variant.name)}Task"
 
