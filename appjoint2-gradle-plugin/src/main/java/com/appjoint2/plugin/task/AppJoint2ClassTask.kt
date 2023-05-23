@@ -77,12 +77,12 @@ abstract class AppJoint2ClassTask : DefaultTask() {
             Log.i("AppJoint2ClassTask find class custom : ${System.currentTimeMillis() - time}ms")
             time = System.currentTimeMillis()
 
-            val mainAppSpecClass = "${ClassInfoRecord.appSpecClass.replace(".", "/")}.class"
-            Log.i("Main AppSpec Class:$mainAppSpecClass ")
-            val appJointClass = "${ClassInfoRecord.ASM_APPJOINT_CLASS_PATH}.class"
-            Log.i("AppJoint2 Core Class:$appJointClass")
 
-            writeClass(mainAppSpecClass,appJointClass)
+
+            val appJointClass = "${ClassInfoRecord.ASM_APPJOINT_CLASS_PATH}.class"
+            Log.i("AppJoint2ClassTask find Main AppSpec Class:${ClassInfoRecord.appSpecClass} , AppJoint Class :$appJointClass")
+
+            writeClass(ClassInfoRecord.appSpecClass,appJointClass)
             Log.i("AppJoint2ClassTask write class custom : ${System.currentTimeMillis() - time}ms")
         }
 
@@ -96,7 +96,7 @@ abstract class AppJoint2ClassTask : DefaultTask() {
                 jarFile.entries().iterator().forEach { jarEntry ->
                     if (jarEntry.isDirectory.not() && jarEntry.name.endsWith(".class")) {
                         jarFile.getInputStream(jarEntry).use { inputStream ->
-                            findClassByVisit(inputStream, jarEntry.name)
+                            findClassByVisit(inputStream, jarEntry.name.replace(".class",""))
                         }
                     }
                 }
@@ -108,7 +108,7 @@ abstract class AppJoint2ClassTask : DefaultTask() {
                     val relativePath = directory.asFile.toURI().relativize(file.toURI()).path
                     Log.d("AppJoint2ClassTask directory asFile relativePath : ${relativePath}")
                     file.inputStream().use { inputStream ->
-                        findClassByVisit(inputStream, relativePath)
+                        findClassByVisit(inputStream, relativePath.replace(".class",""))
                     }
                 }
             }

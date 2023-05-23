@@ -69,12 +69,13 @@ class AppJoint2ClassVisitor(
                 val moduleApplications = ClassInfoRecord.moduleSpecBeans
                 moduleApplications.sortWith(compareBy { it.order })
                 moduleApplications.forEach { it ->
-                    val convertClass = it.className.replace(".", "/")
+                    val convertClass = it.className
                     Log.i("insertApplicationAdd className:${convertClass} , order:${it.order} ")
                     insertApplicationAdd(convertClass)
                 }
 
                 ClassInfoRecord.serviceSpecMap.forEach { router: Pair<String, String>, impl: String ->
+
                     insertRoutersPut(router, impl)
                 }
             }
@@ -187,7 +188,7 @@ class AppJoint2ClassVisitor(
             val routerKey="${router.first}&${router.second}"
             val convertImpl = impl.replace(".", "/")
 
-            Log.d("MethodVisitorAddCodeToConstructor insertRoutersPut routerKey : $routerKey , routerValue : $convertImpl")
+            Log.i("MethodVisitorAddCodeToConstructor insertRoutersPut routerKey : $routerKey , routerValue : $convertImpl")
 
             mv.visitLdcInsn(routerKey)
             mv.visitLdcInsn(Type.getObjectType(convertImpl))

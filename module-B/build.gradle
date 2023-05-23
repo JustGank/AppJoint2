@@ -6,7 +6,7 @@ plugins {
 def config = this.rootProject.ext.android
 
 android {
-    namespace 'com.appjjoint.moduleB'
+    namespace 'com.appjoint2.moduleB'
     compileSdk config.compileSdkVersion
 
     defaultConfig {

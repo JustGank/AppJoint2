@@ -7,11 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.util.Consumer
-import com.appjjoint.moduleB.R
-import com.appjjoint.moduleB.databinding.FragmentModuleBTabBinding
 import com.appjoint2.common.router.app.AppService
 import com.appjoint2.common.router.moduleA.ModuleAService
 import com.appjoint2.core.AppJoint2
+import com.appjoint2.moduleB.R
+import com.appjoint2.moduleB.databinding.FragmentModuleBTabBinding
 
 /**
  * @Author:JustGank
