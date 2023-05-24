@@ -28,7 +28,7 @@ class AppJoint2Plugin : Plugin<Project> {
         project.afterEvaluate {
             Log.logConfig = logConfig
             Log.logConfig.apply { Log.i("logConfig openLog : $openLog , debug : $debug , outputTime : $outputTime") }
-            ClassInfoRecord.clearCache()
+            Log.i("========== AppJoint2 Plugin Initialized! ==========")
         }
 
         with(project) {
@@ -62,11 +62,10 @@ class AppJoint2Plugin : Plugin<Project> {
                             AppJoint2ClassTask::output,
                         )
                 }
-
             }
         }
 
-        Log.i("========== AppJoint2 Plugin Initialized! ==========")
+
 
     }
 

@@ -54,7 +54,7 @@ class AppJoint2ClassVisitor(
 
         override fun visitInsn(opcode: Int) {
 
-            Log.d("MethodVisitorAddCodeToConstructor visitInsn opcode : $opcode")
+            Log.d("AppJoint2ClassVisitor MethodVisitorAddCodeToConstructor visitInsn opcode : $opcode")
 
             if (opcode == Opcodes.IRETURN ||
                 opcode == Opcodes.FRETURN ||
@@ -63,20 +63,21 @@ class AppJoint2ClassVisitor(
                 opcode == Opcodes.DRETURN ||
                 opcode == Opcodes.RETURN
             ) {
-
+                Log.i("AppJoint2ClassVisitor MethodVisitorAddCodeToConstructor insertInitParams")
                 insertInitParams()
 
                 val moduleApplications = ClassInfoRecord.moduleSpecBeans
                 moduleApplications.sortWith(compareBy { it.order })
+                Log.i("AppJoint2ClassVisitor MethodVisitorAddCodeToConstructor insertApplication")
                 moduleApplications.forEach { it ->
                     val convertClass = it.className
-                    Log.i("insertApplicationAdd className:${convertClass} , order:${it.order} ")
-                    insertApplicationAdd(convertClass)
+                    Log.i("className:${convertClass} , order:${it.order} ")
+                    insertApplication(convertClass)
                 }
 
+                Log.i("AppJoint2ClassVisitor MethodVisitorAddCodeToConstructor insertRouter")
                 ClassInfoRecord.serviceSpecMap.forEach { router: Pair<String, String>, impl: String ->
-
-                    insertRoutersPut(router, impl)
+                    insertRouter(router, impl)
                 }
             }
             super.visitInsn(opcode)
@@ -84,9 +85,6 @@ class AppJoint2ClassVisitor(
 
 
         fun insertInitParams() {
-
-            Log.d("MethodVisitorAddCodeToConstructor insertInitParams")
-
             val label1 = Label()
             mv.visitLabel(label1)
             mv.visitLineNumber(20, label1)
@@ -152,10 +150,7 @@ class AppJoint2ClassVisitor(
             )
         }
 
-        fun insertApplicationAdd(applicationName: String) {
-
-            Log.d("MethodVisitorAddCodeToConstructor insertApplicationAdd applicationName : $applicationName")
-
+        fun insertApplication(applicationName: String) {
             mv.visitFieldInsn(
                 Opcodes.GETSTATIC,
                 ClassInfoRecord.ASM_APPJOINT_CLASS_PATH,
@@ -176,9 +171,7 @@ class AppJoint2ClassVisitor(
         }
 
 
-        fun insertRoutersPut(router: Pair<String, String>, impl: String) {
-
-            Log.d("MethodVisitorAddCodeToConstructor insertRoutersPut")
+        fun insertRouter(router: Pair<String, String>, impl: String) {
 
             mv.visitFieldInsn(
                 Opcodes.GETSTATIC, ClassInfoRecord.ASM_APPJOINT_CLASS_PATH, "routersMap",
@@ -188,7 +181,7 @@ class AppJoint2ClassVisitor(
             val routerKey="${router.first}&${router.second}"
             val convertImpl = impl.replace(".", "/")
 
-            Log.i("MethodVisitorAddCodeToConstructor insertRoutersPut routerKey : $routerKey , routerValue : $convertImpl")
+            Log.i("routerKey : $routerKey , routerValue : $convertImpl")
 
             mv.visitLdcInsn(routerKey)
             mv.visitLdcInsn(Type.getObjectType(convertImpl))

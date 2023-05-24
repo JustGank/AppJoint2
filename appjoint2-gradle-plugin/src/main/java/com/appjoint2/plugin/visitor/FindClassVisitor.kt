@@ -16,7 +16,7 @@ class FindClassVisitor(val className: String, val interfaces: Array<String>) :
         when (descriptor) {
 
             ClassInfoRecord.ASM_ANNOTATION_APP_SPEC -> {
-                Log.i("find @AppSpec class : ${className} ")
+                Log.i("FindClassVisitor find @AppSpec class : ${className} ")
                 ClassInfoRecord.appSpecClass = className
             }
 
@@ -28,7 +28,7 @@ class FindClassVisitor(val className: String, val interfaces: Array<String>) :
                             annotationModuleSpecBean.order = value
                         }
                         ClassInfoRecord.moduleSpecBeans.add(annotationModuleSpecBean)
-                        Log.i("find @ModuleSpec class : $className , order : ${annotationModuleSpecBean.order} ")
+                        Log.i("FindClassVisitor find @ModuleSpec class : $className , order : ${annotationModuleSpecBean.order} ")
                         super.visit(name, value)
                     }
                 }
@@ -42,7 +42,7 @@ class FindClassVisitor(val className: String, val interfaces: Array<String>) :
                         valueSpecified = true
                         interfaces.forEach { interfaceName ->
                             val javaInterfaceName=interfaceName.replace("/",".")
-                            Log.i("find @ServiceProvider class : $className , interfaceName : $javaInterfaceName , value : $value")
+                            Log.i("FindClassVisitor find @ServiceProvider class : $className , interfaceName : $javaInterfaceName , value : $value")
                             ClassInfoRecord.serviceSpecMap[Pair(
                                 javaInterfaceName,
                                 value.toString()
@@ -55,7 +55,7 @@ class FindClassVisitor(val className: String, val interfaces: Array<String>) :
                         if (!valueSpecified) {
                             interfaces.forEach { interfaceName ->
                                 val javaInterfaceName=interfaceName.replace("/",".")
-                                Log.i("find @ServiceProvider class : $className , interfaceName : $javaInterfaceName")
+                                Log.i("FindClassVisitor find @ServiceProvider class : $className , interfaceName : $javaInterfaceName")
                                 ClassInfoRecord.serviceSpecMap[Pair(
                                     javaInterfaceName,
                                     "AppJoint2"

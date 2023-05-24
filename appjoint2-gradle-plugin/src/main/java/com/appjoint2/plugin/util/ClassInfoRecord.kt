@@ -44,5 +44,9 @@ object ClassInfoRecord {
         Log.i("ClassInfoRecord clearCache moduleSpecBeans size :${moduleSpecBeans.size} , serviceSpecSet size : ${serviceSpecMap.size}")
     }
 
+    fun outputCurrenCacheInfo(){
+        Log.i("ClassInfoRecord outputCurrenCacheInfo moduleSpecBeans size :${moduleSpecBeans.size} , serviceSpecSet size : ${serviceSpecMap.size} ")
+    }
+
 
 }

@@ -61,29 +61,38 @@ abstract class AppJoint2ClassTask : DefaultTask() {
     @TaskAction
     fun taskAction() {
         Log.i("AppJoint2ClassTask Start!")
+        ClassInfoRecord.clearCache()
         var time = System.currentTimeMillis()
+        var total:Long=0
 
         val parentProject = project.parent
         if (parentProject == null) {
             Log.w("AppJoint2ClassTask parentProject is null , AppJoint2 do nothing!")
         } else {
             appBuildDir = project.buildDir.path
-            parentProject.subprojects.forEach {
-                if (it.buildDir.path != appBuildDir)
-                    subProjectPath.add(it.buildDir.path.also { Log.i("AppJoint2ClassTask subprojects buildDir:$it") })
+            parentProject.subprojects.forEach { project ->
+                if (project.buildDir.path != appBuildDir)
+                    subProjectPath.add(project.buildDir.path.also { Log.d("AppJoint2ClassTask subprojects buildDir:$it") })
             }
 
             findClass()
-            Log.i("AppJoint2ClassTask find class custom : ${System.currentTimeMillis() - time}ms")
+            total=System.currentTimeMillis() - time
             time = System.currentTimeMillis()
+            Log.i("AppJoint2ClassTask find class custom : ${total}ms")
+            ClassInfoRecord.outputCurrenCacheInfo()
 
-
-
+            val mainAppSpecClass = "${ClassInfoRecord.appSpecClass}.class"
             val appJointClass = "${ClassInfoRecord.ASM_APPJOINT_CLASS_PATH}.class"
-            Log.i("AppJoint2ClassTask find Main AppSpec Class:${ClassInfoRecord.appSpecClass} , AppJoint Class :$appJointClass")
 
-            writeClass(ClassInfoRecord.appSpecClass,appJointClass)
+            Log.i("AppJoint2ClassTask Main AppSpec Class:$mainAppSpecClass")
+            Log.i("AppJoint2ClassTask   AppJoint2 Class :$appJointClass")
+
+            writeClass(mainAppSpecClass, appJointClass)
+
             Log.i("AppJoint2ClassTask write class custom : ${System.currentTimeMillis() - time}ms")
+            total += System.currentTimeMillis() - time
+            Log.i("AppJoint2ClassTask total custom : ${total}ms")
+
         }
 
     }
@@ -92,11 +101,11 @@ abstract class AppJoint2ClassTask : DefaultTask() {
         jars.get().forEach { file ->
             val jarFile = JarFile(file.asFile)
             if (checkTargetIsBelongSubproject(jarFile.name)) {
-                Log.d("AppJoint2ClassTask find module jar : ${jarFile.name} ")
+                Log.d("AppJoint2ClassTask findClass jar name: ${jarFile.name} ")
                 jarFile.entries().iterator().forEach { jarEntry ->
                     if (jarEntry.isDirectory.not() && jarEntry.name.endsWith(".class")) {
                         jarFile.getInputStream(jarEntry).use { inputStream ->
-                            findClassByVisit(inputStream, jarEntry.name.replace(".class",""))
+                            findClassByVisit(inputStream, jarEntry.name.replace(".class", ""))
                         }
                     }
                 }
@@ -106,9 +115,9 @@ abstract class AppJoint2ClassTask : DefaultTask() {
             directory.asFile.walk().forEach { file ->
                 if (file.isFile && file.path.endsWith(".class")) {
                     val relativePath = directory.asFile.toURI().relativize(file.toURI()).path
-                    Log.d("AppJoint2ClassTask directory asFile relativePath : ${relativePath}")
+                    Log.d("AppJoint2ClassTask findClass directory relativePath : ${relativePath}")
                     file.inputStream().use { inputStream ->
-                        findClassByVisit(inputStream, relativePath.replace(".class",""))
+                        findClassByVisit(inputStream, relativePath.replace(".class", ""))
                     }
                 }
             }
@@ -129,7 +138,7 @@ abstract class AppJoint2ClassTask : DefaultTask() {
         classReader.accept(FindClassVisitor(className, classReader.interfaces), 0)
     }
 
-    fun writeClass(mainAppSpecClass:String,appJointClass:String){
+    fun writeClass(mainAppSpecClass: String, appJointClass: String) {
         JarOutputStream(BufferedOutputStream(FileOutputStream(output.get().asFile))).use { jarOutput ->
 
             jars.get().forEach { file ->
@@ -143,10 +152,10 @@ abstract class AppJoint2ClassTask : DefaultTask() {
                         jarOutput.putNextEntry(JarEntry(jarEntry.name))
                         jarFile.getInputStream(jarEntry).use { inputStream ->
                             if (jarEntry.name.equals(mainAppSpecClass)) {
-                                Log.i("AppJointClassTask find mainAppSpecClass:$mainAppSpecClass in jars.")
+                                Log.i("AppJoint2ClassTask writeClass find mainAppSpecClass:$mainAppSpecClass in jars.")
                                 jarOutput.write(asmVisitApplication(inputStream).toByteArray())
                             } else if (jarEntry.name.equals(appJointClass)) {
-                                Log.i("AppJointClassTask find appJointClass:$appJointClass in jars.")
+                                Log.i("AppJoint2ClassTask writeClass find appJointClass:$appJointClass in jars.")
                                 jarOutput.write(asmVisitAppJoint(inputStream).toByteArray())
                             }
                         }
@@ -171,14 +180,15 @@ abstract class AppJoint2ClassTask : DefaultTask() {
                         val relativePath = directory.asFile.toURI().relativize(file.toURI()).path
                         val entryName = relativePath.replace(File.separatorChar, '/')
                         jarOutput.putNextEntry(JarEntry(entryName))
+                        Log.d("AppJoint2ClassTask writeClass dirs entryName : $entryName")
                         if (entryName == mainAppSpecClass) {
-                            Log.i("AppJointClassTask find mainAppSpecClass:$mainAppSpecClass in dirs.")
+                            Log.i("AppJoint2ClassTask writeClass find mainAppSpecClass:$mainAppSpecClass in dirs.")
                             file.inputStream().use { inputStream ->
                                 val bytes = asmVisitApplication(inputStream).toByteArray()
                                 jarOutput.write(bytes)
                             }
                         } else if (entryName == appJointClass) {
-                            Log.i("AppJointClassTask find appJointClass:$appJointClass in dirs.")
+                            Log.i("AppJoint2ClassTask writeClass find appJointClass:$appJointClass in dirs.")
                             file.inputStream().use { inputStream ->
                                 jarOutput.write(asmVisitAppJoint(inputStream).toByteArray())
                             }
